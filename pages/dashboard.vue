@@ -52,9 +52,14 @@
               <td>{{ client.phoneNumber }}</td>
               <td>{{ client.email }}</td>
               <td>
-                <button @click="showEditModal(client)" class="edit-button">Editar</button>
-                <button @click="showDetailsModal(client)" class="details-button">Ver Detalhes</button>
-                <button @click="deleteClient(client.id)" class="delete-button">Excluir</button>
+                <div class="dropdown">
+                  <button @click="toggleDropdown(client.id)" class="dropdown-button">Ações</button>
+                  <div v-if="client.showDropdown" class="dropdown-content">
+                    <a @click="showDetailsModal(client)">Ver Detalhes</a>
+                    <a @click="showEditModal(client)">Editar</a>
+                    <a @click="deleteClient(client.id)">Excluir</a>
+                  </div>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -345,6 +350,17 @@ const deleteClient = async (id) => {
   } catch (err) {
     error.value = 'Erro ao excluir cliente.';
   }
+};
+
+const toggleDropdown = (clientId) => {
+  clients.value = clients.value.map(client => {
+    if (client.id === clientId) {
+      client.showDropdown = !client.showDropdown;
+    } else {
+      client.showDropdown = false;
+    }
+    return client;
+  });
 };
 
 onMounted(() => {
