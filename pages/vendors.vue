@@ -193,7 +193,9 @@ const fetchClients = async (url) => {
       }
     });
     const data = await response.json();
-    clients.value = data.data.filter(client => client.is_vendor === 1);
+    console.log('Dados recebidos:', data);  // Log para verificar os dados recebidos
+    clients.value = data.data.filter(client => client.is_vendor === 1 && client.id);  // Filtro por fornecedor e ID
+    console.log('Fornecedores filtrados:', clients.value);  // Log para verificar os fornecedores filtrados
     paginationLinks.value = data.links;
     currentPage.value = data.meta.current_page;
   } catch (err) {

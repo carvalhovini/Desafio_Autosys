@@ -33,7 +33,6 @@
 </template>
 
 <script setup>
-import axios from 'axios';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
@@ -48,15 +47,7 @@ const login = async () => {
   error.value = ''; // Limpa o erro antes de tentar autenticar
   console.log('Tentando autenticar com:', email.value, password.value);
   try {
-    const response = await axios.post('https://back.stage.ecosysauto.com.br/oauth/token', {
-      username: email.value,
-      password: password.value,
-      client_id: '2',
-      client_secret: '9WpPNhnbRPaVK3KwXJaRa8K0yPKPkeFuZK8aGhRQ',
-      grant_type: 'password'
-    });
-    console.log('Resposta da autenticação:', response.data);
-    store.dispatch('login', response.data.access_token);
+    await store.dispatch('login', { email: email.value, password: password.value });
     router.push('/dashboard'); // Redireciona para a página do dashboard
   } catch (err) {
     console.error('Erro ao autenticar:', err.response ? err.response.data : err.message);
@@ -69,6 +60,7 @@ const login = async () => {
   }
 };
 </script>
+
 
 <style scoped>
 .login-page {

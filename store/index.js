@@ -1,3 +1,4 @@
+// store/index.js
 import axios from 'axios';
 import { createStore } from 'vuex';
 
@@ -34,6 +35,21 @@ const store = createStore({
     }
   },
   actions: {
+    async login({ commit }, { email, password }) {
+      try {
+        const response = await axios.post('https://back.stage.ecosysauto.com.br/oauth/token', {
+          username: email,
+          password: password,
+          client_id: '2',
+          client_secret: '9WpPNhnbRPaVK3KwXJaRa8K0yPKPkeFuZK8aGhRQ',
+          grant_type: 'password'
+        });
+        commit('SET_TOKEN', response.data.access_token);
+      } catch (error) {
+        console.error('Erro ao autenticar:', error.response ? error.response.data : error.message);
+        throw error;
+      }
+    },
     async fetchClients({ commit, state }) {
       try {
         const response = await axios.get(BASE_URL, {

@@ -1,5 +1,6 @@
 <template>
   <div class="dashboard-container">
+    <!-- Sidebar component -->
     <aside class="sidebar">
       <div class="sidebar-header">
         <img src="/IMG/Logo.svg" alt="Ecosys Auto Logo" class="logo" />
@@ -19,16 +20,22 @@
         <button @click="logout" class="logout-button">Sair</button>
       </div>
     </aside>
+
+    <!-- Main content area -->
     <main class="main-content">
+      <!-- Header for the main content -->
       <header class="main-header">
         <h1>Clientes</h1>
         <button class="add-button" @click="showAddModal = true">Adicionar</button>
       </header>
       <section class="content">
+        <!-- Search bar for filtering clients -->
         <div class="search-bar">
           <input type="text" placeholder="Digite um nome" v-model="searchQuery" />
           <button class="filter-button">Filtro</button>
         </div>
+        
+        <!-- Table displaying clients -->
         <table>
           <thead>
             <tr>
@@ -59,9 +66,10 @@
             </tr>
           </tbody>
         </table>
+
+        <!-- Pagination controls -->
         <div class="pagination">
-          <span>{{ clients.length }} resultados • registros por página 
-          </span>
+          <span>{{ clients.length }} resultados • registros por página </span>
           <div class="pagination-buttons">
             <button @click="prevPage" :disabled="!paginationLinks.prev">Anterior</button>
             <button @click="nextPage" :disabled="!paginationLinks.next">Próxima</button>
@@ -70,7 +78,7 @@
       </section>
     </main>
 
-    <!-- Modal para adicionar cliente -->
+    <!-- Modal for adding a new client -->
     <div v-if="showAddModal" class="modal-overlay">
       <div class="modal">
         <h3>Cadastrar Cliente</h3>
@@ -159,7 +167,7 @@
       </div>
     </div>
 
-    <!-- Modal para editar cliente -->
+    <!-- Modal for editing a client -->
     <div v-if="showEditModalFlag" class="modal-overlay">
       <div class="modal">
         <h3>Editar Cliente</h3>
@@ -248,7 +256,7 @@
       </div>
     </div>
 
-    <!-- Modal para visualizar detalhes do cliente -->
+    <!-- Modal for viewing client details -->
     <div v-if="showDetailsModalFlag" class="modal-overlay">
       <div class="modal">
         <h3>Detalhes do Cliente</h3>
@@ -282,9 +290,11 @@ import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
+// Router and store instances
 const router = useRouter();
 const store = useStore();
 
+// Reactive references for state management
 const clients = ref([]);
 const loading = ref(false);
 const error = ref('');
@@ -298,11 +308,13 @@ const paginationLinks = ref({
   next: null,
 });
 
+// Modal flags
 const showAddModal = ref(false);
 const showEditModalFlag = ref(false);
 const showDetailsModalFlag = ref(false);
 const selectedClient = ref({});
 
+// New client object
 const newClient = ref({
   name: '',
   phoneNumber: '',
@@ -325,6 +337,7 @@ const newClient = ref({
   observations: ''
 });
 
+// Computed property for paginated clients
 const paginatedClients = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value;
   const end = start + itemsPerPage.value;
@@ -333,8 +346,10 @@ const paginatedClients = computed(() => {
   ).slice(start, end);
 });
 
+// Computed property for total pages
 const totalPages = computed(() => Math.ceil(clients.value.length / itemsPerPage.value));
 
+// Function to fetch clients from API
 const fetchClients = async (url) => {
   loading.value = true;
   try {
@@ -355,28 +370,33 @@ const fetchClients = async (url) => {
   }
 };
 
+// Function for previous page navigation
 const prevPage = () => {
   if (paginationLinks.value.prev) {
     fetchClients(paginationLinks.value.prev);
   }
 };
 
+// Function for next page navigation
 const nextPage = () => {
   if (paginationLinks.value.next) {
     fetchClients(paginationLinks.value.next);
   }
 };
 
+// Function to handle logout
 const logout = () => {
   store.dispatch('logout');
   router.push('/login');
 };
 
+// Function to handle client search
 const searchClients = () => {
   currentPage.value = 1; // Reset to the first page on a new search
   fetchClients();
 };
 
+// Function to add a new client
 const addClient = async () => {
   try {
     const response = await fetch('https://bcar.back.stage.ecosysauto.com.br/api/v1/client', {
@@ -403,8 +423,7 @@ const addClient = async () => {
   }
 };
 
-
-
+// Function to reset input fields
 const resetFields = () => {
   newClient.value = {
     name: '',
@@ -429,11 +448,13 @@ const resetFields = () => {
   };
 };
 
+// Function to show the edit client modal
 const showEditModal = (client) => {
   selectedClient.value = { ...client };
   showEditModalFlag.value = true;
 };
 
+// Function to show the client details modal
 const showDetailsModal = async (client) => {
   try {
     await store.dispatch('fetchClientDetails', client.id);
@@ -444,6 +465,7 @@ const showDetailsModal = async (client) => {
   }
 };
 
+// Function to update client details
 const updateClient = async () => {
   try {
     await store.dispatch('editClient', { id: selectedClient.value.id, client: selectedClient.value });
@@ -454,6 +476,7 @@ const updateClient = async () => {
   }
 };
 
+// Function to delete a client
 const deleteClient = async (id) => {
   try {
     await store.dispatch('deleteClient', id);
@@ -463,6 +486,7 @@ const deleteClient = async (id) => {
   }
 };
 
+// Fetch clients when the component is mounted
 onMounted(() => {
   if (window.innerWidth < 768) {
     router.push('/dashboard-mobile');
