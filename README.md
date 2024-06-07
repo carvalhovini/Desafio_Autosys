@@ -10,6 +10,7 @@ Make sure to install the dependencies:
 # npm
 npm install
 
+# npm consola
 npm install consola
 
 # pnpm
